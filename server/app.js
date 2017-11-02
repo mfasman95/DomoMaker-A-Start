@@ -10,9 +10,10 @@ const favicon = require('serve-favicon');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const expressHandlerbars = require('express-handlebars');
+const session = require('express-session');
 
 // custom modules
-const router = require('./router.js');
+const router = require('./router');
 
 // eslint-disable-next-line no-console
 const log = console.log;
@@ -21,7 +22,9 @@ const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const dbURL = process.env.MONGODB_URI || 'mongodb://localhost/DomoMaker';
 
-mongoose.connect(dbURL, (err) => {
+mongoose.connect(dbURL, {
+  useMongoClient: true,
+}, (err) => {
   if (err) {
     log(chalk.red('Could not connect to database'));
     throw err;
@@ -34,6 +37,12 @@ app.use(favicon(`${__dirname}/../hosted/img/favicon.png`));
 app.use(compression());
 app.use(bodyParser.urlencoded({
   extended: true,
+}));
+app.use(session({
+  key: 'sessionid',
+  secret: 'Domo Arigato',
+  resave: true,
+  saveUninitialized: true,
 }));
 app.engine('handlebars', expressHandlerbars({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');

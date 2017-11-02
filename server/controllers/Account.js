@@ -13,10 +13,14 @@ module.exports.signupPage = (req, res) => {
 };
 
 module.exports.logout = (req, res) => {
+  req.session.destroy();
   res.redirect('/');
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (request, response) => {
+  const req = request;
+  const res = response;
+
   const username = `${req.body.username}`;
   const password = `${req.body.pass}`;
 
@@ -29,11 +33,16 @@ module.exports.login = (req, res) => {
       return res.status(401).json({ error: 'Wrong username or password' });
     }
 
+    req.session.account = Account.AccountModel.toAPI(account);
+
     return res.json({ redirect: '/maker' });
   });
 };
 
-module.exports.signup = (req, res) => {
+module.exports.signup = (request, response) => {
+  const req = request;
+  const res = response;
+
   let { username, pass, pass2 } = req.body;
 
   username = `${username}`;
@@ -52,11 +61,14 @@ module.exports.signup = (req, res) => {
     const password = hash;
 
     // Make the new account
-    new Account.AccountModel({ username, salt, password })
+    const newAccount = new Account.AccountModel({ username, salt, password });
     // Save the new account
-    .save()
+    newAccount.save()
     // After the save, return a response
-    .then(() => res.json({ redirect: '/maker' }))
+    .then(() => {
+      req.session.account = Account.AccountModel.toAPI(newAccount);
+      return res.json({ redirect: '/maker' });
+    })
     // If an error occurs, handle it
     .catch((err) => {
       log(chalk.red(err));
