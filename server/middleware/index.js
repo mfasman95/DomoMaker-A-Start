@@ -15,11 +15,14 @@ module.exports.requiresLogout = (req, res, next) => {
 // The requiresSecure function depends on NODE_ENV
 if (process.env.NODE_ENV === 'production') {
   module.exports.requiresSecure = (req, res, next) => {
+    console.log(`https://${req.hostname}${req.url}`);
     if (req.headers['x-forwarded-proto'] !== 'https') {
       return res.redirect(`https://${req.hostname}${req.url}`);
     }
     return next();
   };
 } else {
-  module.exports.requiresSecure = (req, res, next) => next();
+  module.exports.requiresSecure = (req, res, next) => {
+    next();
+  };
 }
