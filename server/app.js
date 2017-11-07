@@ -78,7 +78,7 @@ app.use((err, req, res, next) => {
 
   log(chalk.red('MISSING CSRF TOKEN!'));
   return false;
-})
+});
 
 router(app);
 

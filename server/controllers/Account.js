@@ -4,15 +4,9 @@ const { Account } = require('../models');
 // eslint-disable-next-line no-console
 const log = console.log;
 
-module.exports.loginPage = (req, res) => {
-  const token = req.csrfToken();
-  console.log(token);
-  res.render('login', { csrfToken: token });
-};
+module.exports.loginPage = (req, res) => res.render('login', { csrfToken: req.csrfToken() });
 
-module.exports.signupPage = (req, res) => {
-  res.render('signup', { csrfToken: req.csrfToken() });
-};
+module.exports.signupPage = (req, res) => res.render('signup', { csrfToken: req.csrfToken() });
 
 module.exports.logout = (req, res) => {
   req.session.destroy();

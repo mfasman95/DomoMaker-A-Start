@@ -23,7 +23,7 @@
     "Login"
   ],
   "author": "Cody Van De Mark",
-  "license": "Apache 2.0",
+  "license": "MIT",
   "dependencies": {
     "body-parser": "^1.15.0",
     "chalk": "^2.3.0",
