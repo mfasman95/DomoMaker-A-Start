@@ -6,8 +6,6 @@ const log = console.log;
 
 module.exports.loginPage = (req, res) => res.render('login', { csrfToken: req.csrfToken() });
 
-module.exports.signupPage = (req, res) => res.render('signup', { csrfToken: req.csrfToken() });
-
 module.exports.logout = (req, res) => {
   req.session.destroy();
   res.redirect('/');
@@ -76,4 +74,13 @@ module.exports.signup = (request, response) => {
       return res.status(400).json({ error: 'An error occurred' });
     });
   });
+};
+
+module.exports.getToken = (request, response) => {
+  const req = request;
+  const res = response;
+
+  const csrfJSON = { csrfToken: req.csrfToken() };
+
+  res.json(csrfJSON);
 };
