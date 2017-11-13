@@ -1,11 +1,13 @@
 'use strict';
 
+var globalCsrfToken = void 0;
+
 var handleDomo = function handleDomo(e) {
   e.preventDefault();
 
   $('domoMessage').animate({ width: 'hide' }, 350);
 
-  if ($('#domoName').val() === '' || $('#domoAge').val() === '') {
+  if ($('#domoName').val() === '' || $('#domoAge').val() === '' || $('#domoMemeScore') === '') {
     handleError('RAWR! All fields are required');
     return false;
   }
@@ -15,6 +17,14 @@ var handleDomo = function handleDomo(e) {
   });
 
   return false;
+};
+
+var deleteDomo = function deleteDomo(e, id, csrf) {
+  e.preventDefault();
+
+  $('domoMessage').animate({ width: 'hide' }, 350);
+
+  sendAjax('POST', '/deleteDomo', 'id=' + id + '&_csrf=' + csrf, loadDomosFromServer);
 };
 
 var DomoForm = function DomoForm(props) {
@@ -40,7 +50,13 @@ var DomoForm = function DomoForm(props) {
       'Age: '
     ),
     React.createElement('input', { id: 'domoAge', type: 'text', name: 'age', placeholder: 'Domo Age' }),
-    React.createElement('input', { type: 'hidden', name: '_csrf', value: props.csrf }),
+    React.createElement(
+      'label',
+      { htmlFor: 'memeScore' },
+      'Meme Score: '
+    ),
+    React.createElement('input', { id: 'domoMemeScore', type: 'text', name: 'memeScore', placeholder: 'Domo Meme Score' }),
+    React.createElement('input', { type: 'hidden', name: '_csrf', value: globalCsrfToken }),
     React.createElement('input', { className: 'makeDomoSubmit', type: 'submit', value: 'Make Domo' })
   );
 };
@@ -73,6 +89,22 @@ var DomoList = function DomoList(props) {
           { className: 'domoAge' },
           'Age: ',
           domo.age
+        ),
+        React.createElement(
+          'h3',
+          { classNAme: 'domoMemeScore' },
+          'Memes: ',
+          domo.memeScore,
+          '/10'
+        ),
+        React.createElement('br', null),
+        React.createElement('hr', null),
+        React.createElement(
+          'button',
+          { onClick: function onClick(e) {
+              deleteDomo(e, domo._id, globalCsrfToken);
+            } },
+          'DELETE'
         )
       );
     })
@@ -86,7 +118,9 @@ var loadDomosFromServer = function loadDomosFromServer() {
 };
 
 var setup = function setup(csrf) {
-  ReactDOM.render(React.createElement(DomoForm, { csrf: csrf }), document.querySelector('#makeDomo'));
+  globalCsrfToken = csrf;
+
+  ReactDOM.render(React.createElement(DomoForm, null), document.querySelector('#makeDomo'));
 
   ReactDOM.render(React.createElement(DomoList, { domos: [] }), document.querySelector('#domos'));
 

@@ -9,19 +9,28 @@ module.exports.makerPage = (req, res) => {
 };
 
 module.exports.makeDomo = (req, res) => {
-  const { name, age } = req.body;
+  const { name, age, memeScore } = req.body;
 
-  if (!name || !age) {
+  if (!name || !age || !memeScore) {
     return res.status(400).json({ error: 'RAWR! Both name and age are required' });
   }
 
   const owner = req.session.account._id;
 
-  return new Domo.DomoModel({ name, age, owner })
+  return new Domo.DomoModel({ name, age, memeScore, owner })
   .save()
   .then(() => res.json({ redirect: '/maker' }))
   .catch((err) => {
     log(chalk.red(err));
+
+    const errString = err.toString();
+    if (errString.includes('memeScore')) {
+      if (errString.includes('more than maximum allowed value')) {
+        return res.status(400).json({ error: 'The Meme Scores Are Too Damn High' });
+      } else if (errString.includes('less than minimum allowed value')) {
+        return res.status(400).json({ error: 'That Meme Score is TOO sad' });
+      }
+    }
 
     if (err.code === 11000) {
       return res.status(400).json({ error: 'Domo already exists' });
@@ -29,6 +38,22 @@ module.exports.makeDomo = (req, res) => {
 
     return res.status(400).json({ error: 'An error occurred' });
   });
+};
+
+module.exports.deleteDomo = (req, res) => {
+  const { id } = req.body;
+
+  if (!id) {
+    return res.status(400).json({ error: 'RAWR! That domo cannot be deleted' });
+  }
+
+  return Domo.DomoModel.remove({ _id: id })
+    .then(() => res.json({ redirect: '/maker' }))
+    .catch((err) => {
+      log(chalk.red(err));
+
+      return res.status(400).json({ error: 'An error occurred' });
+    });
 };
 
 module.exports.makerPage = (req, res) => {
@@ -53,7 +78,7 @@ module.exports.getDomos = (request, response) => {
 
   return Domo.DomoModel.findByOwner(req.session.account._id, (err, docs) => {
     if (err) {
-      console.log(err);
+      log(chalk.red(err));
       return res.status(400).json({ error: 'An error occurred' });
     }
 

@@ -19,6 +19,12 @@ const DomoSchema = new mongoose.Schema({
     min: 0,
     required: true,
   },
+  memeScore: {
+    type: Number,
+    min: 0,
+    max: 10,
+    required: true,
+  },
   owner: {
     type: mongoose.Schema.ObjectId,
     required: true,
@@ -32,7 +38,7 @@ const DomoSchema = new mongoose.Schema({
 
 DomoSchema.statics.findByOwner = (ownerId, callback) =>
   DomoModel.find({ owner: convertId(ownerId) })
-  .select('name age')
+  .select('name age memeScore')
   .exec(callback);
 
 DomoModel = mongoose.model('Domo', DomoSchema);

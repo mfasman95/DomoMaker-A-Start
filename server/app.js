@@ -76,7 +76,7 @@ app.use(csrf());
 app.use((err, req, res, next) => {
   if (err.code !== 'EBADCSRFTOKEN') return next(err);
 
-  log(chalk.red('MISSING CSRF TOKEN!'));
+  log(chalk.red('MISSING CSRF TOKEN!'), chalk.blue(new Date()));
   return false;
 });
 
